@@ -134,6 +134,8 @@ class KeyboardTracker:
                 self.keyPressed = "up"
             elif key is keyDir.down:
                 self.keyPressed = "down"
+            elif key is keyDir.caps_lock:
+                self.keyPressed = "capslock"
 
         print(f"Converted key name to {self.keyPressed}")
         return False

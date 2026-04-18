@@ -14,7 +14,7 @@ def elem2dict(node, attributes=True):
         for item in node.attrib.items():
             # for item in node.items():
             print("Add {} with {}".format(key, result[key]))
-            key, result[key] = item
+            key, result[key] = item # error if this is reached, key undefined? -----
 
     for element in node.iterchildren():
         # Remove namespace prefix
@@ -78,6 +78,7 @@ class profile():
         # function to get the profile name given a profile dir.
         profile_name = None
         # the profile xml is very simple, it should have a single "Profile" element with one "Name" attribute.
+        # {'Profile': {'@Name': 'MechWarrior'}}
         try:
             with open(Path(f"{profile_dir}/profile.xml")) as file_h:
                 profile_dict = xmltodict.parse(file_h.read(), attr_prefix=actionmaps.attr_prefix)
@@ -85,12 +86,12 @@ class profile():
             if len(pkey) == 1:
                 pkey = list(pkey)[0]
             if type(pkey) is not list and pkey.lower() == "profile":
-                p_dict = profile_dict[pkey]
-            nkey = p_dict.keys()
+                name_dict = profile_dict[pkey]
+            nkey = name_dict.keys()
             if len(nkey) == 1:
                 nkey = list(nkey)[0]
             if type(nkey) is not list and nkey.lower() == "@name":
-                profile_name = p_dict[nkey]
+                profile_name = name_dict[nkey]
             if profile_name is None:
                 print("Error getting profile name, assuming directory is good enough")
                 profile_name = os.path.basename(profile_dir)
@@ -150,7 +151,7 @@ class actionmaps(collections.OrderedDict):
 
     def get_action(self, section, lookup, missing_ok=False):
         # check section for the name, raise ValueError if not found.
-        # sectoin can either be the section or the name of the section
+        # section can either be the section or the name of the section
         # can use missing_ok=True to avoid error
         if type(section) == str:
             section, s_idx = self.get_section(section)

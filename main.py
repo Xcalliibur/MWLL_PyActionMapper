@@ -83,7 +83,7 @@ class PyMapper:
 
         dpg.set_exit_callback(callback=self.delete_tempfile)
 
-        #check that the [user home]/Profiles folder
+        # check that the [user home]/Profiles folder exists
         if profilefolder_missing or (len(os.listdir(self.profiles_root)) == 0):
             error_msg = "No profiles found in Documents\\My Games\\Crysis Wars\\Profiles!\n\nYou must create a new profile in Crysis Wars before using this application.\n"
             self.on_error_popup(error_title="No profiles found, exiting!", error_msg=error_msg, showbutton=True, callback=self.exit_window)
@@ -204,12 +204,12 @@ class PyMapper:
             # establish menu bar and its child buttons:
             with dpg.menu_bar(tag="primary_menubar", parent="primary"):
                 with dpg.menu(label="File"):
-                    # dpg.add_menu_item(label="Switch Profile", callback=self.on_switchprofile_prompt)                               # open a different profile's actionmaps
-                    # dpg.add_menu_item(label="Reset to default", callback=self.on_reset_prompt)         # reset current actionmap to last saved version of current actionmap
+                    # dpg.add_menu_item(label="Switch Profile", callback=self.on_switchprofile_prompt) # open a different profile's actionmaps
+                    # dpg.add_menu_item(label="Reset to default", callback=self.on_reset_prompt) # reset current actionmap to last saved version of current actionmap
                     # dpg.add_menu_item(label="Reset changes")
-                    # dpg.add_menu_item(label="New")                                          # create a new actionmap
-                    dpg.add_menu_item(label="Open", callback=self.on_open_prompt)           # browse to and open an existing actionmap
-                    dpg.add_menu_item(label="Save As", callback=self.on_save_prompt)           # save actionmap to a file
+                    # dpg.add_menu_item(label="New") # create a new actionmap
+                    dpg.add_menu_item(label="Open", callback=self.on_open_prompt) # browse to and open an existing actionmap
+                    dpg.add_menu_item(label="Save As", callback=self.on_save_prompt) # save actionmap to a file
                     dpg.add_separator()
                     dpg.add_menu_item(label="Exit", callback=self.exit_window)
                 # with dpg.menu(label="Tools"):
@@ -525,6 +525,9 @@ class PyMapper:
 
 
     def on_save_good(self):
+        """
+        Popup window to alert user to a succesful xml file save.
+        """
         with dpg.mutex():
             viewport_width = dpg.get_viewport_client_width()
             viewport_height = dpg.get_viewport_client_height()
