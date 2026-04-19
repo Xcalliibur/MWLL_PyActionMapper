@@ -11,14 +11,20 @@ Made with the [dearpygui](https://github.com/hoffstadt/DearPyGui) framework, [sc
 * **TASK_4**: Implement ``Invert Control`` option for ASF pitch/yaw/roll, VTOL pitch/yaw/roll, and tank autoboost(?)
 
 * `Switch Profile` menu to bring up initial profile selection, can change "don't ask again dialogue" too.
-* `Save As` window should open up in the actual Profile folder to make saving the actionmapper.xml easier. Also, `Save` button would be nice.
 * `toggle_free_reticle` and `center_free_reticle` seem to have inconsistent behavior. Both key1 and key2 need to be bound (or just non-null?) for it to function. Also might need to be like this between Vehicle and Mech sections, even if just using a mech.
+* **ERROR**: some actions in my older xml don't have a second <key>, so the AM throws a KeyError. Newly created `actionmapper.xml` don't appear to have this issue:
+```
+line 494, in on_keybind_prompt_confirm
+    action_chosen['key'][bindnum]['@name'] = newbind
+KeyError: 1
+```
 
 ### QoL IDEAS:
 * **IDEA_1**: Have the action name in the bind edit popup window be displayed in a distinguishably different color and/or bold
 * **IDEA_2**: May need to up scaling of some elements/text
 
 * Section headers to seperate categories of actions like old Actionmapper. Like `Targeting` or `HUD`
+* When a new Profile is added, it doesn't show up in the selection list until you open the AM a second time. Likely some timing issue for when the data is checked and the window is generated.
 
 ### IDEAS FOR WAAAAAAYYYYYY LATER:
 * **IDEA_1**: Actual joystick/controller support (might not even need it)

@@ -100,7 +100,11 @@ class PyMapper:
                 print("actionmapper_config.ini found, checking if user asked to be prompted again...")
                 self.get_configdata()
                 print("config dontaskagain:", self.config_setting_dontaskagain)
-                if not self.config_setting_dontaskagain:
+                if self.config_setting_dontaskagain == True:
+                    print("user did NOT want to be asked again...")
+                    self.prompt_profileselect_default() # Initialize the dialogue, so it may be opened later
+                    dpg.hide_item("startup_profile_popup")
+                else:
                     print("user did want to be asked again...")
                     self.prompt_profileselect_default()
 
@@ -134,9 +138,14 @@ class PyMapper:
         dpg.set_primary_window("primary", True)
 
     def prompt_profileselect_default(self):
+        """
+        Opens the Profile Select window. dpg tag: startup_profile_popup
+        Code that opens the window is within profile_select.py
+        """
         self.get_configdata()
         print("profiles list from config.ini:", self.config_profiles_names_list)
-        ProfileSelect(profiles_list=self.config_profiles_names_list, callback=self.get_configdata, profiles_root=self.profiles_root)
+        ProfileSelect(profiles_list=self.config_profiles_names_list, callback=self.get_configdata, profiles_root=self.profiles_root,
+                       dontAskAgain=self.config_setting_dontaskagain)
 
     def add_profile_name_to_profilenameslist(self, sctn):
         if "config_profile_name" in sctn:
@@ -145,6 +154,10 @@ class PyMapper:
                 self.config_profiles_names_list.append(profile_name)
 
     def get_configdata(self):
+        """
+        Reads the contents of actionmapper_config.ini \n
+        Sets value of `self.config_setting_dontaskagain` and updates the profile names list
+        """
         print("reading config data...")
         config = config_management.Config(profiles_root=self.profiles_root)
         config_data = config.readConfig()
@@ -204,8 +217,9 @@ class PyMapper:
             # establish menu bar and its child buttons:
             with dpg.menu_bar(tag="primary_menubar", parent="primary"):
                 with dpg.menu(label="File"):
-                    # dpg.add_menu_item(label="Switch Profile", callback=self.on_switchprofile_prompt) # open a different profile's actionmaps
-                    # dpg.add_menu_item(label="Reset to default", callback=self.on_reset_prompt) # reset current actionmap to last saved version of current actionmap
+                    dpg.add_menu_item(label="Switch Profile", callback=self.on_switchprofile_prompt) # open a different profile's actionmaps
+                    dpg.add_separator()
+                    dpg.add_menu_item(label="Reset to default", callback=self.on_reset_prompt) # reset current actionmap to last saved version of current actionmap
                     # dpg.add_menu_item(label="Reset changes")
                     # dpg.add_menu_item(label="New") # create a new actionmap
                     dpg.add_menu_item(label="Open", callback=self.on_open_prompt) # browse to and open an existing actionmap
@@ -554,6 +568,9 @@ class PyMapper:
     def delete_tempfile(self):
         Path.unlink(self.TEMPFILE_PATH, missing_ok=True)
 
+    def on_switchprofile_prompt(self):
+        dpg.show_item("startup_profile_popup")
+
     def on_open_prompt(self):
         with dpg.file_dialog(label="Open Actionmap",
                              width=600,
@@ -636,7 +653,8 @@ class PyMapper:
         dpg.delete_item("primary")
         # perform reset:
         ## load back in the original actionmap xml, then reset the GUI initialized with that data
-        self.actionmap_active.load(self.profile_player_actionmap_path, self.dtd_actionmap)
+        # self.actionmap_active.load(self.profile_player_actionmap_path, self.dtd_actionmap)
+        self.actionmap_active.load(self.xml_default_actionmap, self.dtd_actionmap) # load default actionmap.
         print("Original AM givemecbills:", self.actionmap_saved.get_action("player", "givemecbills"))
         self.actionmap_master_new_list = self.actionmap_master_OG_list
         print("Original AM (just after reset):", self.actionmap_master_new_list)

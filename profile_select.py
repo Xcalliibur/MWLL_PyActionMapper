@@ -3,10 +3,10 @@ from config_management import Config
 from gui_elements import *
 
 class ProfileSelect:
-    def __init__(self, profiles_list, callback, profiles_root):
+    def __init__(self, profiles_list, callback, profiles_root, dontAskAgain=False):
+        self.dontAskAgain = dontAskAgain    # Variable for manually setting checkbox_dontaskagain
         self.on_startup_profile_prompt(profiles_list, callback)
         self.config = Config(profiles_root=profiles_root)
-
 
     def on_startup_profile_prompt(self, profiles_list, callback):
         with dpg.value_registry():
@@ -29,6 +29,7 @@ class ProfileSelect:
             profile_list = profiles_list
             dpg.add_listbox(items=profile_list, tag="listbox_profiles", source="tracker_str_defaultprofile")
             dpg.add_checkbox(label="Don\'t ask again", tag="checkbox_dontaskagain", source="tracker_bool_dontaskagain")
+            dpg.set_value("checkbox_dontaskagain", self.dontAskAgain) # Did not work as add_checkbox(default_value=...), so setting it here.
 
             dpg.add_button(label="Confirm", tag="startup_profile_popup_confirm",
                            callback=lambda s, d: [
@@ -43,7 +44,8 @@ class ProfileSelect:
     @staticmethod
     def exit_window(_sender, _data):
         # dpg.stop_dearpygui()
-        dpg.delete_item("startup_profile_popup")
+        # dpg.delete_item("startup_profile_popup")
+        dpg.hide_item("startup_profile_popup") # hides so it may be opened again with on_switchprofile_prompt() in main.py
 
 
 
