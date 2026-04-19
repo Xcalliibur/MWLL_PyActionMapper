@@ -491,7 +491,10 @@ class PyMapper:
         if newbind == "none":
             newbind = "null"
         ## update chosen keybind of said action:
-        action_chosen['key'][bindnum]['@name'] = newbind
+        if(len(action_chosen['key']) == 2): # normal structure.
+            action_chosen['key'][bindnum]['@name'] = newbind
+        else: # older actionmaps may only have one item instead of a list of two.
+            self.fixOldAction(action_chosen, bindnum, newbind)
         print("updated action chosen:", action_chosen)
         ## add this action back into its corresponding section, using the index acquired earlier:
         category_chosen['action'][action_chosen_index] = action_chosen
@@ -514,6 +517,24 @@ class PyMapper:
         dpg.set_primary_window(window=self.main_window, value=True)
         # also bring the user back to the tab they were working in:
         dpg.set_value(item="tabbar_main", value=f"tabbar_tab_{category.lower()}")
+
+    def fixOldAction(self, action_chosen, bindnum, newbind):
+        """
+        Helper for adding keybinds to actions that only have one key.
+        Older actionmaps may only have one key for some actions. \n
+        Expects one key in action_chosen. Does not handle zero keys, if that were to occur.
+        Args:
+            action_chosen (dict): Represents an action, has only item under 'key'. Is modified in-place.
+            bindnum (int): index number (0 or 1) of the bind slot to modify.
+            newbind (str): the name of the input key to set in the bind slot.
+        Expected input `action_chosen` (malformed):
+            `{'@name': 'moveforward',...'key': {'@name': 'w'}}`
+        Normal structure:
+            `{'@name': 'moveforward',...'key': [{'@name': 'w'}, {'@name': 'null'}]}`
+        """
+        actionList = [action_chosen['key'], {'@name': 'null'}]
+        actionList[bindnum]['@name'] = newbind
+        action_chosen['key'] = actionList # modify action_chosen with the new keys
 
     def write_xml_file(self, actionmaplist, istemp=False, outputpath=None, writedata=None):
         """
